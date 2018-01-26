@@ -38,11 +38,11 @@ def param_generator():
         'high_overlap': 1,
     }
 
-    for x in xrange(
+    for x in range(
             c['low_bound'][0], c['high_bound'][0], c['chunk_size'][0]):
-        for y in xrange(
+        for y in range(
                 c['low_bound'][1], c['high_bound'][1], c['chunk_size'][1]):
-            for z in xrange(
+            for z in range(
                     c['low_bound'][2], c['high_bound'][2], c['chunk_size'][2]):
                 yield '{} {} {} {}-{}_{}-{}_{}-{}'.format(
                     c['watershed_path'], c['segmentation_path'],
@@ -58,16 +58,19 @@ def param_generator():
 operator = MultiTriggerDagRunOperator(
     task_id='trigger_%s' % TARGET_DAG_ID,
     trigger_dag_id=TARGET_DAG_ID,
-    params_list=param_generator(),
+    params_list=list(param_generator()),
     default_args=default_args,
-    dag=scheduler_dag)
+    dag=scheduler_dag,
+    queue='manager')
 
 # ####################### TARGET DAG #################################
 
 target_dag = DAG(
     dag_id=TARGET_DAG_ID,
     default_args=default_args,
-    schedule_interval=None
+    schedule_interval=None,
+    concurrency=8,
+    max_active_runs=128
 )
 
 start = DockerWithVariablesOperator(

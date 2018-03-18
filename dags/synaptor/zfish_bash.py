@@ -233,12 +233,12 @@ for chunk in step1:
 # for chunk in step3:
 #     step2.set_downstream(chunk)
 
-# STEP 4: merge edges
-step4 = merge_edges(dag)
-for chunk in step2:
-    chunk.set_downstream(step4)
+# # STEP 4: merge edges
+# step4 = merge_edges(dag)
+# for chunk in step3:
+#     chunk.set_downstream(step4)
 
 # STEP 5: remap_ids
 step5 = [remap_ids(dag, bb[0], bb[1]) for bb in bboxes]
 for chunk in step5:
-    step4.set_downstream(chunk)
+    step2.set_downstream(chunk)
